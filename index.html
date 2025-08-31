@@ -1,0 +1,554 @@
+<!doctype html>
+
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vitamin C (Betadine) — Spoon‑Scale Titration Calculator</title>
+<style>
+  :root{
+    --bg:#0b1020; --card:#121a33; --muted:#8ea6ff; --text:#eaf0ff; --accent:#7dd3fc; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Thonburi,"Noto Sans Thai",sans-serif;}
+  header{padding:24px 16px 8px; text-align:center}
+  header h1{margin:0 0 6px;font-size:clamp(20px,3vw,28px)}
+  header p{margin:0;color:#c6d3ff88}
+  .container{max-width:1160px;margin:0 auto;padding:16px}
+  .grid{display:grid;gap:14px}
+  @media(min-width:920px){.grid{grid-template-columns:1.1fr 1fr}}
+  .card{background:linear-gradient(180deg,#121a33,#10162d); border:1px solid #243056; border-radius:14px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  h2,h3{margin:.2rem 0 .6rem; color:#cfe2ff}
+  h3{margin-top:.8rem}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  label{display:block;font-size:13px;color:#c6d3ff; margin-bottom:4px}
+  input,select,button,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2a3968;background:#0d1330;color:var(--text);}
+  input::placeholder{color:#94a3b833}
+  .muted{color:#c6d3ff88;font-size:12.5px}
+  .inline{display:flex;gap:8px;align-items:center}
+  .kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+  .kpi .item{background:#0d1330;border:1px dashed #31417a;border-radius:12px;padding:10px}
+  .kpi .big{font-size:18px;font-weight:700}
+  .tag{display:inline-block;background:#0d2b4a;color:#b9ecff;border:1px solid #1b516a;padding:2px 8px;border-radius:999px;font-size:12px}
+  .hr{height:1px;background:linear-gradient(90deg,#24305600,#243056,#24305600);margin:12px 0}
+  table{width:100%;border-collapse:collapse}
+  th,td{border-bottom:1px solid #25335f;padding:8px 10px;text-align:left}
+  th{color:#cfe2ff;background:#0f1632;position:sticky;top:0}
+  tr:hover td{background:#0d133020}
+  .btn{cursor:pointer;transition:.2s border-color,.2s transform}
+  .btn:hover{border-color:#3b82f6;transform:translateY(-1px)}
+  .btn-primary{background:#1e293b;border:1px solid #334155}
+  .btn-accent{background:#0b3a3f;border:1px solid #11636b}
+  .btn-danger{background:#3b0b16;border:1px solid #6b1121}
+  .help{font-size:12px;color:#b6c3ffcc;margin-top:6px}
+  code{background:#0d1330;border:1px solid #2a3968;color:#a3e2ff;padding:2px 6px;border-radius:6px}
+  .right{justify-self:end}
+  .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #2a3968;border-radius:999px;padding:4px 10px;background:#0d1330}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+  footer{opacity:.8;text-align:center;padding:14px}
+
+  /* Responsive tweaks for mobile and tablets */
+  @media(max-width:640px){
+    .grid{grid-template-columns:1fr!important}
+    .row,.row-3{grid-template-columns:1fr!important}
+    .kpi{grid-template-columns:1fr!important}
+    input,select,button,textarea{font-size:14px}
+    th,td{font-size:12px}
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>คำนวณวิตามินซี แบบ “หยดเบตาดีน + แป้ง” (เคมีย่อส่วน)</h1>
+    <p>ใช้งานง่าย • ป้อน “จำนวนหยด” แล้วให้ระบบคำนวณให้ครบ: คาลิเบรต mg/หยด → mg ในตัวอย่าง → mg/100 mL</p>
+  </header>
+  <div class="container grid">
+    <!-- CALIBRATION CARD -->
+    <section class="card" id="calibCard">
+      <h2>เฟส A — คาลิเบรต “mg ต่อ 1 หยด” ของเบตาดีน</h2>
+      <p class="muted">ตั้งความแรงของสารมาตรฐานตามวิธีทำของคุณ (แบบสเกลช้อน) ระบบจะคำนวณความเข้มข้น และมวลวิตามินซีใน “อะไลคอต” ที่ใช้คาลิเบรต แล้วหารด้วยจำนวนหยดเฉลี่ย</p><div class="row-3">
+    <div>
+      <label>ความแรงเม็ดวิตามินซีทั้งหมด (mg)</label>
+      <input type="number" id="stdTotalMg" value="100" min="1" step="0.1"/>
+      <div class="help">ค่านิยม: 100 mg/เม็ด</div>
+    </div>
+    <div>
+      <label>ปริมาตรที่ใช้ละลายรวม</label>
+      <div class="inline">
+        <input type="number" id="stdDilCount" value="8" min="0.1" step="0.1"/>
+        <select id="stdDilUnit">
+          <option value="tbsp">ช้อนโต๊ะ</option>
+          <option value="tsp">ช้อนชา</option>
+          <option value="ml">มิลลิลิตร</option>
+        </select>
+      </div>
+      <div class="help">ตัวอย่างตามใบงาน: 8 ช้อนโต๊ะ ≈ “ครึ่งแก้ว”</div>
+    </div>
+    <div>
+      <label>อะไลคอตที่ใช้คาลิเบรต (ต่อ 1 รอบทดลอง)</label>
+      <div class="inline">
+        <input type="number" id="stdAliquotCount" value="1" min="0.1" step="0.1"/>
+        <select id="stdAliquotUnit">
+          <option value="tsp">ช้อนชา</option>
+          <option value="tbsp">ช้อนโต๊ะ</option>
+          <option value="ml">มิลลิลิตร</option>
+        </select>
+      </div>
+      <div class="help">ตัวอย่างในบทสนทนา: 1 ช้อนชา</div>
+    </div>
+  </div>
+
+  <h3>จำนวนหยดถึงจุดยุติ (มาตรฐาน)</h3>
+  <div class="row-3">
+    <div>
+      <label>หยด #1</label>
+      <input type="number" class="calDrop" value="" placeholder="เช่น 20" min="0" step="1"/>
+    </div>
+    <div>
+      <label>หยด #2</label>
+      <input type="number" class="calDrop" value="" placeholder="เช่น 21" min="0" step="1"/>
+    </div>
+    <div>
+      <label>หยด #3</label>
+      <input type="number" class="calDrop" value="" placeholder="เช่น 19" min="0" step="1"/>
+    </div>
+  </div>
+
+  <div class="kpi">
+    <div class="item">
+      <div class="muted">ความเข้มข้นมาตรฐาน</div>
+      <div class="big" id="stdConc">—</div>
+      <div class="muted">mg / mL</div>
+    </div>
+    <div class="item">
+      <div class="muted">มวลวิตามินซีในอะไลคอต</div>
+      <div class="big" id="stdAliquotMg">—</div>
+      <div class="muted">mg ต่อรอบ</div>
+    </div>
+    <div class="item">
+      <div class="muted">แฟกเตอร์ (f)</div>
+      <div class="big" id="factor">—</div>
+      <div class="muted">mg / หยด</div>
+    </div>
+  </div>
+
+  <!-- Recommended dilution advice for calibration (iodine and starch) -->
+  <div class="help" id="dilutionAdviceCalib" style="margin-top:10px"></div>
+
+  <div class="hr"></div>
+  <div class="inline" style="justify-content:space-between;gap:10px;flex-wrap:wrap">
+    <div class="help">ปลายทางของสี: น้ำเงิน–ดำคงอยู่ ≥ 30 วินาที จึงนับว่า “ถึงจุดยุติ”</div>
+    <div class="inline">
+      <button class="btn btn-primary" id="btnCalReset">ล้างข้อมูลคาลิเบรต</button>
+    </div>
+  </div>
+</section>
+
+<!-- SAMPLES CARD -->
+<!-- SAMPLES CARD -->
+<section class="card" id="samplesCard">
+  <h2>เฟส B — ตัวอย่างน้ำผลไม้</h2>
+
+  <p class="muted">
+    กำหนดปริมาตรอะไลคอตของ “น้ำผลไม้” (หน่วยช้อน/มล.) และป้อนจำนวนหยด 2–3 รอบ 
+    ระบบจะคำนวณ mg ในอะไลคอต และ mg/100 mL ให้อัตโนมัติ
+  </p>
+
+  <div class="row" style="align-items:end">
+    <div class="inline" style="gap:10px;align-items:flex-end">
+      <div>
+        <label>อะไลคอตตัวอย่างเริ่มต้น (ค่าเริ่มต้น)</label>
+        <div class="inline">
+          <input type="number" id="sampleAliquotCountDefault" value="1" min="0.1" step="0.1"/>
+          <select id="sampleAliquotUnitDefault">
+            <option value="tbsp">ช้อนโต๊ะ</option>
+            <option value="tsp">ช้อนชา</option>
+            <option value="ml">มิลลิลิตร</option>
+          </select>
+        </div>
+        <div class="help">ค่าคลาสสิกในใบงาน: 1 ช้อนโต๊ะ = 15 mL</div>
+      </div>
+    </div>
+    <div class="right">
+      <button class="btn btn-accent" id="addRow">+ เพิ่มตัวอย่าง</button>
+      <button class="btn btn-danger" id="clearRows" style="margin-left:6px">ล้างทั้งหมด</button>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div style="overflow:auto; max-height:520px">
+    <table id="samplesTable">
+      <thead>
+        <tr>
+          <th style="min-width:140px">ชื่อผลไม้/ตัวอย่าง</th>
+          <th>อะไลคอต</th>
+          <th>หยด #1</th>
+          <th>หยด #2</th>
+          <th>หยด #3</th>
+          <th>เฉลี่ยหยด</th>
+          <th>mg ในอะไลคอต</th>
+          <th>mg / 100 mL</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="sampleBody"></tbody>
+    </table>
+  </div>
+
+  <div class="kpi" style="margin-top:14px">
+    <div class="item">
+      <div class="muted">แฟกเตอร์ (f) ปัจจุบัน</div>
+      <div class="big" id="factorMirror">—</div>
+      <div class="muted">mg/หยด (อัปเดตอัตโนมัติจากเฟส A)</div>
+    </div>
+    <div class="item">
+      <div class="muted">ตัวอย่างที่ค่าวิตามินซีสูงสุด</div>
+      <div class="big" id="bestSample">—</div>
+      <div class="muted">(จาก mg/100 mL)</div>
+    </div>
+    <div class="item">
+      <div class="muted">คำแนะนำ</div>
+      <div class="big" id="hint">กรอกค่าเพื่อเริ่มคำนวณ</div>
+      <div class="muted">ปรับความเข้มเบตาดีนให้เป็น “สีน้ำตาลอ่อน” เพื่อความละเอียด</div>
+    </div>
+  </div>
+
+  <!-- Recommended dilution advice for samples (iodine and starch) -->
+  <div class="help" id="dilutionAdviceSamples" style="margin-top:10px"></div>
+
+  <!-- Export and print controls -->
+  <div class="inline" style="justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:8px">
+    <button class="btn btn-primary" id="btnExportCSV">Export CSV</button>
+    <button class="btn btn-primary" id="btnPrint">พิมพ์ใบงาน</button>
+  </div>
+
+</section>
+
+  </div>  <footer>
+    <span class="pill">1 ช้อนชา = 5 mL</span>
+    <span class="pill">1 ช้อนโต๊ะ = 15 mL</span>
+    <span class="pill">Endpoint = น้ำเงิน–ดำ &ge; 30 วินาที</span>
+  </footer><script>
+// ===============================
+// Helper ฟังก์ชัน
+// ===============================
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const num = (v, d=0) => {
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : d;
+};
+const fmt = (n, digits=2) => Number.isFinite(n) ? n.toFixed(digits) : '—';
+
+// แปลงหน่วยช้อน → mL
+function mlFrom(count, unit){
+  const c = Math.max(0, num(count));
+  if(unit === 'tsp') return c * 5;       // ช้อนชา
+  if(unit === 'tbsp') return c * 15;     // ช้อนโต๊ะ
+  return c;                              // mL
+}
+  
+  
+function getIodineDilutionAdvice(mgAliquot, stdConc){
+  const tspMl = 5;      // 1 ช้อนชา
+  const tbspMl = 15;    // 1 ช้อนโต๊ะ
+  const eps = 1e-3;
+
+  if(!Number.isFinite(stdConc) || stdConc <= 0){
+    return 'คำแนะนำไอโอดีน: โปรดกรอกค่ามาตรฐาน (mg/mL) ก่อน<br>' +
+           'โซลูชัน โพวิโดน-ไอโอดีน USP 10% w/v (≈1% available iodine)';
+  }
+
+  // = 1.00 mg/mL → ใช้เพียว ๆ
+  if (Math.abs(stdConc - 1.00) < eps){
+    return `ความเข้มข้นมาตรฐาน ${stdConc.toFixed(2)} mg/mL (พอดี)<br>` +
+           `ใช้โซลูชัน โพวิโดน-ไอโอดีน USP 10% w/v (≈1% available iodine) เพียว ๆ โดยไม่ต้องเจือจางน้ำ`;
+  }
+
+  // > 1.00 mg/mL → แนะนำความเข้มข้นโซลูชันที่สูงขึ้น (คูณตามสัดส่วน)
+  if (stdConc > 1.00){
+    const betadinePercent = (stdConc * 10).toFixed(1); // 1 mg/mL ≈ 10% w/v
+    const availIodine    = (stdConc *  1).toFixed(2);  // 1 mg/mL ≈ 1% available iodine
+    return `ความเข้มข้นมาตรฐาน ${stdConc.toFixed(2)} mg/mL (เข้มกว่า)<br>` +
+           `ควรใช้โซลูชัน โพวิโดน-ไอโอดีน USP ประมาณ <b>${betadinePercent}% w/v</b> ` +
+           `(≈ <b>${availIodine}% available iodine</b>)`;
+  }
+
+  // < 1.00 mg/mL → ใช้สูตรปัดง่าย: ratio = round(10*(1 - stdConc)) และล็อกสูงสุด 1:10
+  // ตัวอย่าง: 0.50→1:5, 0.60→1:4, 0.55→~1:5, 0.90→1:1, ≤0.10→1:10
+  let ratio = Math.round(10 * (1 - stdConc));
+  if (stdConc <= 0.10) ratio = 10;         // บังคับให้ต่ำมากเป็น 1:10
+  ratio = Math.min(Math.max(ratio, 1), 10); // คุมช่วง 1..10
+
+  const waterMl   = ratio * tspMl;          // น้ำ (mL) ต่อเบตาดีน 1 ช้อนชา
+  const waterTbsp = waterMl / tbspMl;       // แปลงเป็นช้อนโต๊ะ
+
+  return `ความเข้มข้นมาตรฐาน ${stdConc.toFixed(2)} mg/mL (อ่อนกว่า)<br>` +
+         `แนะนำให้ ใช้โซลูชัน โพวิโดน-ไอโอดีน USP 10% w/v (≈1% available iodine) 1 ช้อนชา (≈${tspMl} mL) ` +
+         `+ น้ำ ≈ ${waterTbsp.toFixed(1)} ช้อนโต๊ะ (≈ ${Math.round(waterMl)} mL)<br>` +
+         `หรือตาม อัตราส่วน ≈ <b>1 : ${ratio}</b> (จำกัดสูงสุด 1:10)<br>` +
+       `เป้าหมายสี: น้ำตาลอ่อน โปร่งแสงเหมือนชา (~20–30 หยด)`;
+}
+
+
+function getStarchAdvice(stdMg, stdConc, dilMl){
+  if(!Number.isFinite(stdMg) || !Number.isFinite(stdConc) || stdConc <= 0 || !Number.isFinite(dilMl) || dilMl <= 0){
+    return 'การเตรียมแป้ง: กรุณากรอกข้อมูลใน Phase A ก่อน';
+  }
+
+  const phaseA =
+    `<b>การเตรียมแป้ง (Phase A - Calibration):</b><br>` +
+    `ถ้าวิตามินซีที่ใช้คาลิเบรท = <b>${stdMg.toFixed(1)} mg</b> ในน้ำ <b>${dilMl.toFixed(1)} mL</b><br>` +
+    `ให้นำวิตามินซี ${stdMg.toFixed(1)} mg ผสมกับแป้ง ${stdMg.toFixed(1)} mg (1:1) ก่อน<br>` +
+    `จากนั้นจึงผสมน้ำตามปริมาตรที่คุณต้องการใช้ในการคาลิเบรท<br>` +
+    `(เช่น วิตามินซี ${stdMg.toFixed(1)} mg + แป้ง ${stdMg.toFixed(1)} mg หรือ  ${stdMg.toFixed(0)/10} g  → เติมน้ำจนได้ปริมาตรรวม ${dilMl.toFixed(1)} mL)`;  
+
+  const phaseB =
+    `<b>การเตรียมแป้ง (Phase B - Samples):</b><br>` +
+    `ถ้าใน Phase A เราผสมวิตามินซี ${stdMg.toFixed(1)} mg กับน้ำ ${dilMl.toFixed(1)} mL<br>` +
+    `ใน Phase B ก็ให้ทำเหมือนกัน โดยที่ เราผสมแป้ง ${stdMg.toFixed(1)} mg หรือ  ${stdMg.toFixed(0)/10} g  กับน้ำ ${dilMl.toFixed(1)} mL<br> : แล้วก็นำแป้งที่ผสมน้ำแล้ว ให้ไปผสมสารละลายตัวอย่างที่ต้องการทดลองในอัตราส่วนอะไลคอต 1:1 เช่น (อะไลคอต 5 mL ต่อ น้ำแป้ง 5 mL)<br>` +
+    
+    `(หลักการ: ทำให้เงื่อนไขการผสมเหมือนกับที่ใช้ในการคาลิเบรท เพื่อความสอดคล้อง)`;  
+
+  return { phaseA, phaseB };
+}
+
+
+// ค่าเริ่มต้นตัวอย่าง
+const defaults = {
+  samples: [
+    { name:'ส้ม', vCount:1, vUnit:'tbsp', d1:'', d2:'', d3:'' },
+    { name:'มะนาว', vCount:1, vUnit:'tbsp', d1:'', d2:'', d3:'' },
+    { name:'มะเขือเทศ', vCount:1, vUnit:'tbsp', d1:'', d2:'', d3:'' },
+  ]
+};
+
+// โหลด/บันทึก LocalStorage (อัตโนมัติทุกครั้งที่คำนวณ)
+const LS_KEY = 'vitc_betadine_spoon_calc_v1';
+function saveState(){
+  const state = collectState();
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw){ seedDefaultSamples(); return; }
+    const st = JSON.parse(raw);
+    if(st && Array.isArray(st.samples)){
+      // เติมค่า UI ส่วนคาลิเบรต
+      $('#stdTotalMg').value = st.stdTotalMg ?? 100;
+      $('#stdDilCount').value = st.stdDilCount ?? 8;
+      $('#stdDilUnit').value = st.stdDilUnit ?? 'tbsp';
+      $('#stdAliquotCount').value = st.stdAliquotCount ?? 1;
+      $('#stdAliquotUnit').value = st.stdAliquotUnit ?? 'tsp';
+      const cals = $$('.calDrop');
+      (st.calDrops ?? []).forEach((v,i)=>{ if(cals[i]) cals[i].value = v; });
+      // สร้างตารางตัวอย่าง
+      $('#sampleBody').innerHTML = '';
+      (st.samples ?? []).forEach(addSampleRow);
+      // ค่า default aliquot
+      $('#sampleAliquotCountDefault').value = st.sampleAliquotCountDefault ?? 1;
+      $('#sampleAliquotUnitDefault').value = st.sampleAliquotUnitDefault ?? 'tbsp';
+    } else {
+      seedDefaultSamples();
+    }
+  }catch(e){
+    console.warn('loadState() error', e);
+    seedDefaultSamples();
+  }
+}
+function collectState(){
+  const calDrops = $$('.calDrop').map(i=>i.value);
+  const samples = $$('tr.sample').map(tr=>({
+    name: $('.s_name', tr).value,
+    vCount: $('.s_vcount', tr).value,
+    vUnit: $('.s_vunit', tr).value,
+    d1: $('.s_d1', tr).value,
+    d2: $('.s_d2', tr).value,
+    d3: $('.s_d3', tr).value,
+  }));
+  return {
+    stdTotalMg: $('#stdTotalMg').value,
+    stdDilCount: $('#stdDilCount').value,
+    stdDilUnit: $('#stdDilUnit').value,
+    stdAliquotCount: $('#stdAliquotCount').value,
+    stdAliquotUnit: $('#stdAliquotUnit').value,
+    calDrops,
+    sampleAliquotCountDefault: $('#sampleAliquotCountDefault').value,
+    sampleAliquotUnitDefault: $('#sampleAliquotUnitDefault').value,
+    samples,
+  };
+}
+
+function seedDefaultSamples(){
+  $('#sampleBody').innerHTML = '';
+  defaults.samples.forEach(addSampleRow);
+}
+
+// เพิ่มแถวตัวอย่าง
+function addSampleRow(data){
+  const tbody = $('#sampleBody');
+  const tr = document.createElement('tr');
+  tr.className = 'sample';
+  tr.innerHTML = `
+    <td><input class="s_name" value="${(data?.name??'ตัวอย่าง').replaceAll('"','&quot;')}"/></td>
+    <td>
+      <div class="inline">
+        <input type="number" class="s_vcount" value="${num(data?.vCount ?? $('#sampleAliquotCountDefault').value,1)}" step="0.1" min="0.1"/>
+        <select class="s_vunit">
+          <option value="tbsp" ${ (data?.vUnit ?? $('#sampleAliquotUnitDefault').value)==='tbsp'?'selected':'' }>ช้อนโต๊ะ</option>
+          <option value="tsp" ${ (data?.vUnit ?? $('#sampleAliquotUnitDefault').value)==='tsp'?'selected':'' }>ช้อนชา</option>
+          <option value="ml" ${ (data?.vUnit ?? $('#sampleAliquotUnitDefault').value)==='ml'?'selected':'' }>mL</option>
+        </select>
+      </div>
+    </td>
+    <td><input type="number" class="s_d1" placeholder="หยด" min="0" step="1" value="${data?.d1 ?? ''}"></td>
+    <td><input type="number" class="s_d2" placeholder="หยด" min="0" step="1" value="${data?.d2 ?? ''}"></td>
+    <td><input type="number" class="s_d3" placeholder="หยด" min="0" step="1" value="${data?.d3 ?? ''}"></td>
+    <td class="s_avg">—</td>
+    <td class="s_mg">—</td>
+    <td class="s_mg100">—</td>
+    <td><button class="btn btn-danger del">ลบ</button></td>
+  `;
+  tbody.appendChild(tr);
+
+  tr.addEventListener('input', ()=>{ recalcAll(); saveState(); });
+  $('.del', tr).addEventListener('click', ()=>{ tr.remove(); recalcAll(); saveState(); });
+}
+
+// คำนวณเฉลี่ย (นับเฉพาะที่มีค่า)
+function avgDrops(values){
+  const nums = values.map(v=>num(v)).filter(v=>Number.isFinite(v) && v>0);
+  if(nums.length===0) return NaN;
+  return nums.reduce((a,b)=>a+b,0)/nums.length;
+}
+
+// สร้าง CSV จากตารางตัวอย่างและดาวน์โหลด
+function exportCSV(){
+  const header = ['ชื่อผลไม้/ตัวอย่าง','อะไลคอต','หน่วย','หยด #1','หยด #2','หยด #3','เฉลี่ยหยด','mg ในอะไลคอต','mg/p (mg/100ml)'];
+  const rows = [header.join(',')];
+  $$('#sampleBody tr.sample').forEach(tr => {
+    const name = $('.s_name', tr).value || '';
+    const vCount = $('.s_vcount', tr).value || '';
+    const vUnit = $('.s_vunit', tr).value || '';
+    const d1 = $('.s_d1', tr).value || '';
+    const d2 = $('.s_d2', tr).value || '';
+    const d3 = $('.s_d3', tr).value || '';
+    const avg = $('.s_avg', tr).textContent || '';
+    const mg = $('.s_mg', tr).textContent || '';
+    const mg100 = $('.s_mg100', tr).textContent || '';
+    rows.push([name, vCount, vUnit, d1, d2, d3, avg, mg, mg100].join(','));
+  });
+  const csv = rows.join('\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'vitamin_c_results.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+
+// คำนวณทั้งหมด
+function recalcAll(){
+  // ===== เฟส A คาลิเบรต =====
+  const stdMg = num($('#stdTotalMg').value, 100);
+  const dilMl = mlFrom($('#stdDilCount').value, $('#stdDilUnit').value);
+  const conc = dilMl>0 ? (stdMg / dilMl) : NaN; // mg/mL
+  $('#stdConc').textContent = fmt(conc);
+
+  const aliquotMl = mlFrom($('#stdAliquotCount').value, $('#stdAliquotUnit').value);
+  const aliquotMg = Number.isFinite(conc) ? conc * aliquotMl : NaN; // mg ในอะไลคอต
+  $('#stdAliquotMg').textContent = fmt(aliquotMg);
+
+  const calDrops = $$('.calDrop').map(i=>i.value);
+  const calAvg = avgDrops(calDrops);
+  const factor = (Number.isFinite(aliquotMg) && calAvg>0) ? (aliquotMg / calAvg) : NaN; // mg/หยด
+  $('#factor').textContent = fmt(factor, 4);
+  $('#factorMirror').textContent = fmt(factor, 4);
+
+  // ===== แนะนำอัตราส่วนการเจือจางเบตาดีนและแป้ง =====
+const iodineMsg = getIodineDilutionAdvice(aliquotMg, conc);
+const starchAdvice = getStarchAdvice(stdMg, conc, dilMl);
+
+if(document.getElementById('dilutionAdviceCalib')){
+  // เฟส A แสดงทั้ง เบตาดีน + แป้ง (Phase A + B)
+  document.getElementById('dilutionAdviceCalib').innerHTML = iodineMsg + "<br><br>" + starchAdvice.phaseA + "<br><br>" ;
+}
+if(document.getElementById('dilutionAdviceSamples')){
+  // เฟส B แสดงเฉพาะ Phase B
+  document.getElementById('dilutionAdviceSamples').innerHTML = starchAdvice.phaseB + "<br><br>";
+}
+
+
+
+  // ===== เฟส B ตัวอย่าง =====
+  let best = { name:'—', val: -Infinity };
+  $$('#sampleBody tr.sample').forEach(tr=>{
+    const name = $('.s_name', tr).value || 'ตัวอย่าง';
+    const vCount = $('.s_vcount', tr).value; const vUnit = $('.s_vunit', tr).value;
+    const d1 = $('.s_d1', tr).value, d2 = $('.s_d2', tr).value, d3 = $('.s_d3', tr).value;
+
+    const mL = mlFrom(vCount, vUnit);
+    const avg = avgDrops([d1,d2,d3]);
+    $('.s_avg', tr).textContent = Number.isFinite(avg) ? fmt(avg,2) : '—';
+
+    const mgAliquot = (Number.isFinite(factor) && Number.isFinite(avg)) ? factor * avg : NaN;
+    $('.s_mg', tr).textContent = Number.isFinite(mgAliquot) ? fmt(mgAliquot,2) : '—';
+
+    const mg100 = (mL>0 && Number.isFinite(mgAliquot)) ? mgAliquot * (100 / mL) : NaN;
+    $('.s_mg100', tr).textContent = Number.isFinite(mg100) ? fmt(mg100,1) : '—';
+
+    if(Number.isFinite(mg100) && mg100>best.val){ best = { name, val: mg100 }; }
+  });
+
+  $('#bestSample').textContent = (best.val>0) ? `${best.name} • ${fmt(best.val,1)} mg/100 mL` : '—';
+
+  // hint
+  const hint = (!Number.isFinite(conc) || !Number.isFinite(aliquotMg)) ? 'กรอกค่าในเฟส A ให้ครบ' : (!Number.isFinite(factor) ? 'ใส่จำนวนหยดคาลิเบรตอย่างน้อย 1 ค่า' : 'พร้อมใช้งาน: ป้อนหยดของตัวอย่าง');
+  $('#hint').textContent = hint;
+}
+
+// อีเวนต์และปุ่ม
+function attachEvents(){
+  // เฟส A
+  ['#stdTotalMg','#stdDilCount','#stdDilUnit','#stdAliquotCount','#stdAliquotUnit'].forEach(sel=>{
+    $(sel).addEventListener('input', ()=>{ recalcAll(); saveState(); });
+  });
+  $$('.calDrop').forEach(inp=> inp.addEventListener('input', ()=>{ recalcAll(); saveState(); }));
+  $('#btnCalReset').addEventListener('click', ()=>{
+    $('#stdTotalMg').value = 100;
+    $('#stdDilCount').value = 8; $('#stdDilUnit').value = 'tbsp';
+    $('#stdAliquotCount').value = 1; $('#stdAliquotUnit').value = 'tsp';
+    $$('.calDrop').forEach(i=> i.value='');
+    recalcAll(); saveState();
+  });
+
+  // ตัวอย่าง: ปุ่มเพิ่ม/ล้าง
+  $('#addRow').addEventListener('click', ()=>{ addSampleRow({ name:'ตัวอย่างใหม่', vCount: $('#sampleAliquotCountDefault').value, vUnit: $('#sampleAliquotUnitDefault').value }); recalcAll(); saveState(); });
+  $('#clearRows').addEventListener('click', ()=>{ $('#sampleBody').innerHTML=''; recalcAll(); saveState(); });
+
+  // ค่า default aliquot ของตัวอย่าง
+  ['#sampleAliquotCountDefault','#sampleAliquotUnitDefault'].forEach(sel=>{
+    $(sel).addEventListener('input', ()=> saveState());
+  });
+
+  // ปุ่ม export CSV และพิมพ์ใบงาน
+  const exp = document.getElementById('btnExportCSV');
+  if(exp) exp.addEventListener('click', exportCSV);
+  const prt = document.getElementById('btnPrint');
+  if(prt) prt.addEventListener('click', () => { window.print(); });
+}
+
+// เริ่มทำงาน
+loadState();
+attachEvents();
+recalcAll();
+</script></body>
+</html>

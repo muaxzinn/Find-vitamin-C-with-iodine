@@ -502,8 +502,8 @@ if(document.getElementById('dilutionAdviceSamples')){
     const avg = avgDrops([d1,d2,d3]);
     $('.s_avg', tr).textContent = Number.isFinite(avg) ? fmt(avg,2) : '—';
 
-    const mgAliquot = (Number.isFinite(factor) && Number.isFinite(avg)) ? factor * avg : NaN;
-    $('.s_mg', tr).textContent = Number.isFinite(mgAliquot) ? fmt(mgAliquot,2) : '—';
+    const mgAliquot = (Number.isFinite(factor) && Number.isFinite(avg)) ? (factor * avg * 2) : NaN;
+    $('.s_mg', tr).textContent = Number.isFinite(mgAliquot) ? fmt(mgAliquot,2) : '—';.s_mg', tr).textContent = Number.isFinite(mgAliquot) ? fmt(mgAliquot,2) : '—';
 
     const mg100 = (mL>0 && Number.isFinite(mgAliquot)) ? (mgAliquot * (100 / mL) * 2) : NaN;
     $('.s_mg100', tr).textContent = Number.isFinite(mg100) ? fmt(mg100,1) : '—';

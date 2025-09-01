@@ -151,9 +151,12 @@
   <h2>เฟส B — ตัวอย่างน้ำผลไม้</h2>
 
   <p class="muted">
-    กำหนดปริมาตรอะไลคอตของ “น้ำผลไม้” (หน่วยช้อน/มล.) และป้อนจำนวนหยด 2–3 รอบ 
-    ระบบจะคำนวณ mg ในอะไลคอต และ mg/100 mL ให้อัตโนมัติ
-  </p>
+  ผู้ใช้ต้องผสม <b>แป้งกับตัวอย่างน้ำผลไม้หรือสารละลาย ในอัตราส่วน 1:1</b> ก่อน  
+  จากนั้นให้นำน้ำแป้งที่ผสมแล้วกับตัวอย่างมารวมกับน้ำตามที่ต้องการ  
+  แล้วนำ <b>ปริมาตรรวมของสารละลายที่ผสมแล้ว</b> (mL/ช้อน) ไปกรอกในช่องที่กำหนด  
+  พร้อมป้อนจำนวนหยด 2–3 รอบ ระบบจะคำนวณค่าอะไลคอตของสารละลายอัตโนมัติ  
+  และแสดงผลเป็น mg ในอะไลคอต และ mg/100 mL เหมือนเดิม
+</p>
 
   <div class="row" style="align-items:end">
     <div class="inline" style="gap:10px;align-items:flex-end">
@@ -502,7 +505,7 @@ if(document.getElementById('dilutionAdviceSamples')){
     const mgAliquot = (Number.isFinite(factor) && Number.isFinite(avg)) ? factor * avg : NaN;
     $('.s_mg', tr).textContent = Number.isFinite(mgAliquot) ? fmt(mgAliquot,2) : '—';
 
-    const mg100 = (mL>0 && Number.isFinite(mgAliquot)) ? mgAliquot * (100 / mL) : NaN;
+    const mg100 = (mL>0 && Number.isFinite(mgAliquot)) ? (mgAliquot * (100 / mL) * 2) : NaN;
     $('.s_mg100', tr).textContent = Number.isFinite(mg100) ? fmt(mg100,1) : '—';
 
     if(Number.isFinite(mg100) && mg100>best.val){ best = { name, val: mg100 }; }
